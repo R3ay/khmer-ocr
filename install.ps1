@@ -16,7 +16,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
             }
             if ([string]::IsNullOrWhiteSpace($ScriptText) -or $ScriptText.Length -lt 100) {
                 # Fallback: Download from the known raw GitHub URL
-                $ScriptText = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/R3ay/khmer-ocr/main/install.ps1" -UserAgent "Mozilla/5.0"
+                $ScriptText = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/OiiiSteav/khmer-ocr/main/install.ps1" -UserAgent "Mozilla/5.0"
             }
             Set-Content -Path $TempScriptPath -Value $ScriptText -Encoding UTF8
             Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$TempScriptPath`"" -Verb RunAs
@@ -29,6 +29,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 
 $ErrorActionPreference = "Stop"
+$ProgressPreference = "SilentlyContinue" # Disables the blue progress bar to speed up downloads by up to 10x
 
 # Configuration
 $TargetDir = "$env:USERPROFILE\KhmerOCR"
