@@ -204,8 +204,16 @@ class OCRWorker(QThread):
             return image
 
     def _ocr_with_confidence(self, image, config_str) -> tuple[str, float]:
-        """Runs Tesseract OCR and calculates the average confidence score for recognized words."""
+        """Runs Tesseract OCR to get the raw formatted text and the average confidence score."""
         try:
+            # 1. Run image_to_string to get the high-accuracy raw formatted text (preserving newlines and natural spacing)
+            raw_text = pytesseract.image_to_string(
+                image,
+                lang=config.OCR_LANG,
+                config=config_str
+            ).strip()
+            
+            # 2. Run image_to_data to get word-level confidence scores
             data = pytesseract.image_to_data(
                 image, 
                 lang=config.OCR_LANG, 
@@ -213,25 +221,15 @@ class OCRWorker(QThread):
                 output_type=pytesseract.Output.DICT
             )
             
-            # Filter out empty text results and metadata (-1 confidence)
             confidences = []
-            words = []
-            
-            for i in range(len(data['text'])):
-                word = data['text'][i].strip()
-                conf = int(data['conf'][i])
-                
-                if conf != -1:
-                    confidences.append(conf)
-                    if word != "":
-                        words.append(word)
-            
-            # Combine recognized words
-            text = " ".join(words).strip()
+            for conf in data['conf']:
+                conf_val = int(conf)
+                if conf_val != -1:
+                    confidences.append(conf_val)
             
             # Calculate average confidence
             avg_conf = sum(confidences) / len(confidences) if confidences else 0.0
-            return text, avg_conf
+            return raw_text, avg_conf
             
         except Exception as e:
             logger.error(f"Error in confidence-based OCR pass: {e}")
