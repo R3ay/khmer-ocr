@@ -104,6 +104,22 @@ If you prefer to set up the project manually for development or customization, f
 
 ---
 
+## Auto-Updates & Versioning
+
+The application features a built-in, silent background auto-updater that keeps the application files and dependencies synchronized with the latest release on GitHub.
+
+- **Silent Background Checks:** Five seconds after the application starts, it silently checks the remote `version.txt` file on GitHub. If a newer version is available, it downloads the latest repository ZIP in the background, overwrites the local script files (safely in-memory), silently updates any new Python dependencies via `pip` in a hidden window, and automatically restarts the application to apply the changes.
+- **Manual Checks:** You can manually trigger an update check by right-clicking the system tray icon and selecting **"Check for Updates (vX.X.X)"**.
+- **How to Release an Update (For Developers):**
+  1. Make your code modifications locally.
+  2. Increment the version number in `config.py` (e.g., `VERSION = "1.3.0"`).
+  3. Increment the version string in `version.txt` (e.g., `1.3.0`).
+  4. Run `.\push.ps1` in your terminal. 
+  
+  All active client installations will automatically detect, download, and apply the update on their next startup.
+
+---
+
 ## Configuration & Customization
 
 You can customize the application behavior by editing `config.py`:
