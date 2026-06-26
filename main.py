@@ -326,17 +326,12 @@ def main():
     # If the PNG logo is newer than the ICO icon (or if the ICO is missing), it is regenerated
     base_dir = os.path.dirname(os.path.abspath(__file__))
     logo_path = os.path.join(base_dir, "logo.png")
-    ico_path = os.path.join(base_dir, "logo_v4.ico")
+    ico_path = os.path.join(base_dir, "logo_v5.ico")
     if os.path.exists(logo_path):
         if not os.path.exists(ico_path) or os.path.getmtime(logo_path) > os.path.getmtime(ico_path):
             try:
-                from PIL import Image as PILImage
-                img = PILImage.open(logo_path)
-                img.save(
-                    ico_path, 
-                    format="ICO", 
-                    sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
-                )
+                from make_png_ico import save_png_ico
+                save_png_ico(logo_path, ico_path)
                 # Programmatically notify the Windows Shell to clear and rebuild the icon cache globally
                 if sys.platform == "win32":
                     import ctypes

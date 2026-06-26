@@ -9,6 +9,58 @@ logger = logging.getLogger("KhmerOCR.OCR")
 # Set the Tesseract executable path in pytesseract
 pytesseract.pytesseract.tesseract_cmd = config.TESSERACT_CMD
 
+def reorder_khmer_vowels(text: str) -> str:
+    """
+    Robust Khmer Unicode Reordering Corrector.
+    Automatically detects if Tesseract has outputted pre-posed vowels (េ, ែ, ៃ, ោ, ៅ)
+    in visual order (e.g. U+17C2 + U+1794 for ែប) and reorders them into correct logical
+    Unicode order (U+1794 + U+17C2 for បែ).
+    
+    It uses a robust syllable-boundary heuristic to prevent false-positives on words
+    that are already in correct logical order (like 'ចេញ' / U+1785 + U+17C1 + U+1789).
+    """
+    chars = list(text)
+    n = len(chars)
+    i = 0
+    while i < n:
+        char = chars[i]
+        # Check if it's a pre-posed vowel: U+17C1 to U+17C5
+        if '\u17C1' <= char <= '\u17C5':
+            # Is it followed by a consonant?
+            if i + 1 < n and '\u1780' <= chars[i+1] <= '\u17A2':
+                # Is it preceded by a base consonant?
+                is_preceded_by_base = False
+                if i - 1 >= 0 and '\u1780' <= chars[i-1] <= '\u17A2':
+                    # The preceding character is a consonant. Is it a base consonant?
+                    # Check if the character before it is a vowel or diacritic
+                    if i - 2 >= 0:
+                        prev_prev = chars[i-2]
+                        if '\u17B6' <= prev_prev <= '\u17D3' and prev_prev != '\u17D2':
+                            # It is preceded by a vowel/diacritic, so it's a final consonant, NOT a base consonant!
+                            is_preceded_by_base = False
+                        else:
+                            is_preceded_by_base = True
+                    else:
+                        is_preceded_by_base = True
+                
+                if not is_preceded_by_base:
+                    # It is in visual order! We need to move the vowel after the consonant cluster.
+                    # The consonant cluster starts at i+1.
+                    # It consists of the consonant at i+1, followed by any subscripts (U+17D2 + consonant).
+                    vowel = chars[i]
+                    cluster_end = i + 1
+                    # Scan for subscripts
+                    while cluster_end + 2 < n and chars[cluster_end+1] == '\u17D2' and '\u1780' <= chars[cluster_end+2] <= '\u17A2':
+                        cluster_end += 2
+                    
+                    # Move the vowel to the end of the cluster
+                    chars.pop(i)
+                    chars.insert(cluster_end, vowel)
+                    n = len(chars)
+                    continue
+        i += 1
+    return "".join(chars)
+
 class OCRWorker(QThread):
     """
     A QThread worker to perform offline OCR using Tesseract in the background
@@ -121,8 +173,8 @@ class OCRWorker(QThread):
                 
             logger.info(f"Selecting {selected_pass} with confidence {best_conf:.1f}%")
             
-            # Final cleanup and emit
-            final_text = best_text.strip()
+            # Final cleanup, vowel reordering, and emit
+            final_text = reorder_khmer_vowels(best_text.strip())
             self.finished.emit(final_text)
             
         except pytesseract.TesseractNotFoundError:
