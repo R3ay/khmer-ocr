@@ -7,6 +7,10 @@ BASE_DIR = Path(__file__).resolve().parent
 LOG_DIR = BASE_DIR / "logs"
 LOG_DIR.mkdir(exist_ok=True)
 
+# Application Versioning & Updates
+VERSION = "1.2.0"
+GITHUB_REPO = "OiiiSteav/khmer-ocr"
+
 # Logging configuration
 LOG_FILE = LOG_DIR / "app.log"
 LOG_LEVEL = logging.INFO

@@ -1,7 +1,7 @@
 import sys
 import os
 import logging
-from PyQt6.QtCore import Qt, QObject, pyqtSlot
+from PyQt6.QtCore import Qt, QObject, pyqtSlot, QTimer
 from PyQt6.QtGui import QIcon, QPixmap, QPainter, QBrush, QColor, QFont, QAction
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QMessageBox
 
@@ -36,6 +36,7 @@ from hotkey import HotkeyListener
 from overlay import OverlayManager
 from capture import capture_region
 from ocr import OCRWorker
+from updater import AutoUpdater
 import pyperclip
 
 class KhmerOCRApp(QObject):
@@ -62,6 +63,10 @@ class KhmerOCRApp(QObject):
         self.help_action = QAction("How to Setup & Use", self)
         self.help_action.triggered.connect(self.show_help_dialog)
         self.tray_menu.addAction(self.help_action)
+        
+        self.update_action = QAction(f"Check for Updates (v{config.VERSION})", self)
+        self.update_action.triggered.connect(self.check_for_updates_manually)
+        self.tray_menu.addAction(self.update_action)
         
         self.tray_menu.addSeparator()
         
@@ -92,6 +97,15 @@ class KhmerOCRApp(QObject):
             "Khmer OCR Running", 
             "Press Win + Shift + K to capture and OCR Khmer text offline."
         )
+        
+        # 5. Initialize and start the silent background auto-updater after a 5-second delay
+        self.updater = AutoUpdater(os.path.dirname(os.path.abspath(__file__)))
+        self.updater.update_ready.connect(self.on_update_ready)
+        self.updater.update_error.connect(self.on_update_error)
+        self.updater.no_update_needed.connect(self.on_no_update_needed)
+        
+        self.manual_update_check = False
+        QTimer.singleShot(5000, self.updater.start)
 
     def _create_stylish_icon(self) -> QIcon:
         """Generates a high-fidelity tray icon programmatically (no external file needed)."""
@@ -230,11 +244,66 @@ class KhmerOCRApp(QObject):
         msg_box.exec()
 
     @pyqtSlot()
+    def check_for_updates_manually(self):
+        """Manually triggers an update check from the tray menu."""
+        logger.info("Manual update check requested.")
+        if self.updater.isRunning():
+            self.show_tray_message("Checking...", "An update check is already in progress.")
+            return
+            
+        self.manual_update_check = True
+        self.show_tray_message("Checking for Updates", "Checking GitHub for newer versions...")
+        self.updater.start()
+
+    @pyqtSlot()
+    def on_update_ready(self):
+        """Callback when an update has been downloaded and applied in the background."""
+        logger.info("Update ready. Triggering restart.")
+        self.show_tray_message(
+            "Update Installed!", 
+            "The latest version has been downloaded. Restarting application to apply updates...",
+            QSystemTrayIcon.MessageIcon.Information
+        )
+        # Wait 3 seconds for the user to read the message, then restart
+        QTimer.singleShot(3000, self.restart_application)
+
+    @pyqtSlot(str)
+    def on_update_error(self, error_message: str):
+        logger.error(f"Auto-update error: {error_message}")
+        if self.manual_update_check:
+            self.manual_update_check = False
+            self.show_tray_message("Update Failed", "Failed to check for updates. See logs for details.", QSystemTrayIcon.MessageIcon.Warning)
+
+    @pyqtSlot()
+    def on_no_update_needed(self):
+        logger.info("No update needed.")
+        if self.manual_update_check:
+            self.manual_update_check = False
+            self.show_tray_message(
+                "Up to Date", 
+                f"You are running the latest version (v{config.VERSION}).",
+                QSystemTrayIcon.MessageIcon.Information
+            )
+
+    def restart_application(self):
+        """Cleanly restarts the application to load updated files."""
+        logger.info("Restarting application...")
+        self.hotkey_listener.stop()
+        self.tray_icon.hide()
+        # Restart the python process
+        os.execv(sys.executable, [sys.executable] + sys.argv)
+
+    @pyqtSlot()
     def exit_application(self):
         """Stops threads and quits the application cleanly."""
         logger.info("Exiting application...")
         # Stop the hotkey listener Win32 message loop thread
         self.hotkey_listener.stop()
+        
+        # Stop the updater if running
+        if self.updater.isRunning():
+            self.updater.terminate()
+            self.updater.wait()
         
         # Hide the tray icon immediately to prevent it from lingering in the taskbar
         self.tray_icon.hide()
