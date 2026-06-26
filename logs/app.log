@@ -1,0 +1,196 @@
+2026-06-25 10:49:00,395 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 10:49:00,431 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 16368
+2026-06-25 10:49:00,431 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 10:49:00,476 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:49:00,476 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:49:00,476 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:49:01,912 [INFO] KhmerOCR.Overlay: Esc pressed. Cancelling selection.
+2026-06-25 10:49:01,912 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:49:01,938 [INFO] KhmerOCR.Main: Screen selection cancelled by user.
+2026-06-25 10:50:12,366 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 10:50:12,398 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 19340
+2026-06-25 10:50:12,398 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 10:50:18,780 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:50:18,782 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:50:18,782 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:50:56,474 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 10:50:56,507 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 16548
+2026-06-25 10:50:56,507 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 10:51:06,427 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:51:06,427 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:51:06,427 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:51:06,602 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:51:06,602 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:51:06,602 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:51:06,618 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:53:01,090 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 10:53:01,119 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 18240
+2026-06-25 10:53:01,119 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 10:53:08,749 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:53:08,749 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:53:08,749 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:53:11,583 [INFO] KhmerOCR.Overlay: Selection completed: local=PyQt6.QtCore.QRect(471, 288, 718, 103), global=(471, 288, 718, 103)
+2026-06-25 10:53:11,583 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:53:11,606 [INFO] KhmerOCR.Main: Overlay selection received: 471, 288, 718, 103. Starting capture and OCR.
+2026-06-25 10:53:11,606 [INFO] KhmerOCR.Capture: Capturing screen region: left=471, top=288, width=718, height=103
+2026-06-25 10:53:11,710 [INFO] KhmerOCR.Capture: Screen region successfully captured.
+2026-06-25 10:53:11,743 [INFO] KhmerOCR.OCR: OCR worker thread started.
+2026-06-25 10:53:11,743 [INFO] KhmerOCR.OCR: Running pytesseract with lang='khm'...
+2026-06-25 10:53:12,672 [INFO] KhmerOCR.OCR: OCR complete. Characters recognized: 31
+2026-06-25 10:53:12,672 [INFO] KhmerOCR.Main: Successfully copied recognized text to clipboard.
+2026-06-25 10:53:25,605 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:53:25,614 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:53:25,614 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:53:28,393 [INFO] KhmerOCR.Overlay: Selection completed: local=PyQt6.QtCore.QRect(278, 514, 389, 71), global=(278, 514, 389, 71)
+2026-06-25 10:53:28,393 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:53:28,406 [INFO] KhmerOCR.Main: Overlay selection received: 278, 514, 389, 71. Starting capture and OCR.
+2026-06-25 10:53:28,406 [INFO] KhmerOCR.Capture: Capturing screen region: left=278, top=514, width=389, height=71
+2026-06-25 10:53:28,423 [INFO] KhmerOCR.Capture: Screen region successfully captured.
+2026-06-25 10:53:28,454 [INFO] KhmerOCR.OCR: OCR worker thread started.
+2026-06-25 10:53:28,454 [INFO] KhmerOCR.OCR: Running pytesseract with lang='khm'...
+2026-06-25 10:53:28,548 [INFO] KhmerOCR.OCR: OCR complete. Characters recognized: 21
+2026-06-25 10:53:28,549 [INFO] KhmerOCR.Main: Successfully copied recognized text to clipboard.
+2026-06-25 10:55:36,452 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 10:55:36,488 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 21016
+2026-06-25 10:55:36,488 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 10:56:04,860 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 10:56:04,903 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 17104
+2026-06-25 10:56:04,903 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 10:56:09,736 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:56:09,736 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:56:09,919 [INFO] KhmerOCR.Overlay: Selection too small, treating as cancel.
+2026-06-25 10:56:09,919 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:56:09,929 [INFO] KhmerOCR.Main: Screen selection cancelled by user.
+2026-06-25 10:56:10,589 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:56:10,589 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:56:11,101 [INFO] KhmerOCR.Overlay: Selection too small, treating as cancel.
+2026-06-25 10:56:11,101 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:56:11,101 [INFO] KhmerOCR.Main: Screen selection cancelled by user.
+2026-06-25 10:56:18,473 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:56:18,473 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:56:19,583 [INFO] KhmerOCR.Overlay: Esc pressed. Cancelling selection.
+2026-06-25 10:56:19,583 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:56:19,599 [INFO] KhmerOCR.Main: Screen selection cancelled by user.
+2026-06-25 10:56:46,110 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 10:56:46,142 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 18668
+2026-06-25 10:56:46,142 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 10:57:08,482 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 10:57:08,514 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 14300
+2026-06-25 10:57:08,514 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 10:57:16,386 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:57:16,386 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:57:16,386 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:57:21,575 [INFO] KhmerOCR.Overlay: Selection completed: local=PyQt6.QtCore.QRect(185, 202, 1290, 625), global=(185, 202, 1290, 625)
+2026-06-25 10:57:21,575 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:57:21,594 [INFO] KhmerOCR.Main: Overlay selection received: 185, 202, 1290, 625. Starting capture and OCR.
+2026-06-25 10:57:21,594 [INFO] KhmerOCR.Capture: Capturing screen region: left=185, top=202, width=1290, height=625
+2026-06-25 10:57:21,717 [INFO] KhmerOCR.Capture: Screen region successfully captured.
+2026-06-25 10:57:21,749 [INFO] KhmerOCR.OCR: OCR worker thread started.
+2026-06-25 10:57:21,749 [INFO] KhmerOCR.OCR: Running pytesseract with lang='khm'...
+2026-06-25 10:57:22,174 [INFO] KhmerOCR.OCR: OCR complete. Characters recognized: 394
+2026-06-25 10:57:22,182 [INFO] KhmerOCR.Main: Successfully copied recognized text to clipboard.
+2026-06-25 10:57:49,855 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 10:57:49,886 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 16208
+2026-06-25 10:57:49,886 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 10:58:17,299 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 10:58:17,331 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 14472
+2026-06-25 10:58:17,331 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 10:58:29,155 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:58:29,155 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:58:29,155 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:58:33,711 [INFO] KhmerOCR.Overlay: Selection completed: local=PyQt6.QtCore.QRect(303, 294, 1019, 300), global=(303, 294, 1019, 300)
+2026-06-25 10:58:33,711 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:58:33,711 [INFO] KhmerOCR.Main: Overlay selection received: 303, 294, 1019, 300. Starting capture and OCR.
+2026-06-25 10:58:33,711 [INFO] KhmerOCR.Capture: Capturing screen region: left=303, top=294, width=1019, height=300
+2026-06-25 10:58:33,791 [INFO] KhmerOCR.Capture: Screen region successfully captured.
+2026-06-25 10:58:33,823 [INFO] KhmerOCR.OCR: OCR worker thread started.
+2026-06-25 10:58:33,823 [INFO] KhmerOCR.OCR: Running pytesseract with lang='khm'...
+2026-06-25 10:58:34,005 [INFO] KhmerOCR.OCR: OCR complete. Characters recognized: 102
+2026-06-25 10:58:34,005 [INFO] KhmerOCR.Main: Successfully copied recognized text to clipboard.
+2026-06-25 10:58:50,515 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:58:50,515 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:58:50,515 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:58:53,038 [INFO] KhmerOCR.Overlay: Selection completed: local=PyQt6.QtCore.QRect(288, 723, 359, 56), global=(288, 723, 359, 56)
+2026-06-25 10:58:53,038 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:58:53,060 [INFO] KhmerOCR.Main: Overlay selection received: 288, 723, 359, 56. Starting capture and OCR.
+2026-06-25 10:58:53,060 [INFO] KhmerOCR.Capture: Capturing screen region: left=288, top=723, width=359, height=56
+2026-06-25 10:58:53,070 [INFO] KhmerOCR.Capture: Screen region successfully captured.
+2026-06-25 10:58:53,110 [INFO] KhmerOCR.OCR: OCR worker thread started.
+2026-06-25 10:58:53,110 [INFO] KhmerOCR.OCR: Running pytesseract with lang='khm'...
+2026-06-25 10:58:53,189 [INFO] KhmerOCR.OCR: OCR complete. Characters recognized: 21
+2026-06-25 10:58:53,196 [INFO] KhmerOCR.Main: Successfully copied recognized text to clipboard.
+2026-06-25 10:59:19,167 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:59:19,177 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:59:19,177 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:59:21,221 [INFO] KhmerOCR.Overlay: Selection completed: local=PyQt6.QtCore.QRect(276, 456, 376, 78), global=(276, 456, 376, 78)
+2026-06-25 10:59:21,221 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:59:21,237 [INFO] KhmerOCR.Main: Overlay selection received: 276, 456, 376, 78. Starting capture and OCR.
+2026-06-25 10:59:21,237 [INFO] KhmerOCR.Capture: Capturing screen region: left=276, top=456, width=376, height=78
+2026-06-25 10:59:21,254 [INFO] KhmerOCR.Capture: Screen region successfully captured.
+2026-06-25 10:59:21,279 [INFO] KhmerOCR.OCR: OCR worker thread started.
+2026-06-25 10:59:21,279 [INFO] KhmerOCR.OCR: Running pytesseract with lang='khm'...
+2026-06-25 10:59:21,389 [INFO] KhmerOCR.OCR: OCR complete. Characters recognized: 24
+2026-06-25 10:59:21,389 [INFO] KhmerOCR.Main: Successfully copied recognized text to clipboard.
+2026-06-25 10:59:52,188 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 10:59:52,188 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 10:59:52,188 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 10:59:56,116 [INFO] KhmerOCR.Overlay: Esc pressed. Cancelling selection.
+2026-06-25 10:59:56,116 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 10:59:56,143 [INFO] KhmerOCR.Main: Screen selection cancelled by user.
+2026-06-25 11:00:07,192 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 11:00:07,210 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 11:00:07,210 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 11:00:09,679 [INFO] KhmerOCR.Overlay: Selection completed: local=PyQt6.QtCore.QRect(355, 571, 1034, 183), global=(355, 571, 1034, 183)
+2026-06-25 11:00:09,679 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 11:00:09,695 [INFO] KhmerOCR.Main: Overlay selection received: 355, 571, 1034, 183. Starting capture and OCR.
+2026-06-25 11:00:09,695 [INFO] KhmerOCR.Capture: Capturing screen region: left=355, top=571, width=1034, height=183
+2026-06-25 11:00:09,711 [INFO] KhmerOCR.Capture: Screen region successfully captured.
+2026-06-25 11:00:09,743 [INFO] KhmerOCR.OCR: OCR worker thread started.
+2026-06-25 11:00:09,743 [INFO] KhmerOCR.OCR: Running pytesseract with lang='khm'...
+2026-06-25 11:00:09,964 [INFO] KhmerOCR.OCR: OCR complete. Characters recognized: 197
+2026-06-25 11:00:09,972 [INFO] KhmerOCR.Main: Successfully copied recognized text to clipboard.
+2026-06-25 11:01:05,600 [INFO] KhmerOCR.Main: Exiting application...
+2026-06-25 11:01:05,600 [INFO] KhmerOCR.Hotkey: Global hotkey unregistered. Hotkey thread exiting.
+2026-06-25 11:43:32,049 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 11:43:32,138 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 13092
+2026-06-25 11:43:32,139 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 11:43:43,182 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 11:43:43,184 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 11:43:43,185 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 11:43:45,486 [INFO] KhmerOCR.Overlay: Selection completed: local=PyQt6.QtCore.QRect(124, 678, 188, 66), global=(124, 678, 188, 66)
+2026-06-25 11:43:45,486 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 11:43:45,504 [INFO] KhmerOCR.Main: Overlay selection received: 124, 678, 188, 66. Starting capture and OCR.
+2026-06-25 11:43:45,506 [INFO] KhmerOCR.Capture: Capturing screen region: left=124, top=678, width=188, height=66
+2026-06-25 11:43:45,640 [INFO] KhmerOCR.Capture: Screen region successfully captured.
+2026-06-25 11:43:45,718 [INFO] KhmerOCR.OCR: OCR worker thread started.
+2026-06-25 11:43:45,718 [INFO] KhmerOCR.OCR: Running pytesseract with lang='khm'...
+2026-06-25 11:43:45,889 [INFO] KhmerOCR.OCR: OCR complete. Characters recognized: 29
+2026-06-25 11:43:45,901 [INFO] KhmerOCR.Main: Successfully copied recognized text to clipboard.
+2026-06-25 11:43:53,742 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 11:43:53,745 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 11:43:53,746 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 11:43:56,940 [INFO] KhmerOCR.Overlay: Selection completed: local=PyQt6.QtCore.QRect(356, 705, 78, 48), global=(356, 705, 78, 48)
+2026-06-25 11:43:56,941 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 11:43:56,958 [INFO] KhmerOCR.Main: Overlay selection received: 356, 705, 78, 48. Starting capture and OCR.
+2026-06-25 11:43:56,959 [INFO] KhmerOCR.Capture: Capturing screen region: left=356, top=705, width=78, height=48
+2026-06-25 11:43:56,981 [INFO] KhmerOCR.Capture: Screen region successfully captured.
+2026-06-25 11:43:57,055 [INFO] KhmerOCR.OCR: OCR worker thread started.
+2026-06-25 11:43:57,056 [INFO] KhmerOCR.OCR: Running pytesseract with lang='khm'...
+2026-06-25 11:43:57,141 [INFO] KhmerOCR.OCR: OCR complete. Characters recognized: 0
+2026-06-25 11:43:57,141 [WARNING] KhmerOCR.Main: OCR complete, but no text was recognized.
+2026-06-25 11:47:00,955 [INFO] KhmerOCR.Main: Application initialized and running in system tray.
+2026-06-25 11:47:01,037 [INFO] KhmerOCR.Hotkey: Hotkey thread started with ID: 20628
+2026-06-25 11:47:01,039 [INFO] KhmerOCR.Hotkey: Global hotkey successfully registered.
+2026-06-25 11:47:04,181 [INFO] KhmerOCR.Hotkey: Hotkey triggered.
+2026-06-25 11:47:04,182 [INFO] KhmerOCR.Main: Starting screen selection flow.
+2026-06-25 11:47:04,183 [INFO] KhmerOCR.Overlay: Spawning selection overlays across 1 screen(s).
+2026-06-25 11:47:07,619 [INFO] KhmerOCR.Overlay: Selection completed: local=PyQt6.QtCore.QRect(132, 701, 178, 43), global_physical=(132, 701, 178, 43), dpr=1.0
+2026-06-25 11:47:07,620 [INFO] KhmerOCR.Overlay: Closing all active overlays.
+2026-06-25 11:47:07,638 [INFO] KhmerOCR.Main: Overlay selection received: 132, 701, 178, 43. Starting capture and OCR.
+2026-06-25 11:47:07,639 [INFO] KhmerOCR.Capture: Capturing screen region: left=132, top=701, width=178, height=43
+2026-06-25 11:47:07,748 [INFO] KhmerOCR.Capture: Saved debug capture to C:\Users\R3AY\.gemini\antigravity\scratch\khmer_ocr_app\logs\debug_capture.png
+2026-06-25 11:47:07,749 [INFO] KhmerOCR.Capture: Screen region successfully captured.
+2026-06-25 11:47:07,814 [INFO] KhmerOCR.OCR: OCR worker thread started.
+2026-06-25 11:47:07,814 [INFO] KhmerOCR.OCR: Running pytesseract with lang='khm'...
+2026-06-25 11:47:07,966 [INFO] KhmerOCR.OCR: OCR complete. Characters recognized: 23
+2026-06-25 11:47:07,983 [INFO] KhmerOCR.Main: Successfully copied recognized text to clipboard.
