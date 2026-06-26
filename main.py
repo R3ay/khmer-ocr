@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QMessageBox
 if sys.platform == "win32":
     try:
         import ctypes
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("OiiiSteav.KhmerOCR.v1")
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Khmer OCR")
     except Exception:
         pass
 
