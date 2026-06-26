@@ -83,6 +83,7 @@ def start_training(training_dir, max_iterations):
     print(f"\nFound {len(tif_files)} training pairs. Converting to .lstmf format...")
     
     # 3. Convert .tif/.box pairs to .lstmf files
+    successful_lstmf_files = []
     for tif in tif_files:
         base_name = os.path.splitext(tif)[0]
         tif_path = os.path.join(training_dir, tif)
@@ -97,9 +98,14 @@ def start_training(training_dir, max_iterations):
         cmd = [tesseract_cmd, tif_path, output_base, "lstm.train"]
         try:
             run_command(cmd)
+            successful_lstmf_files.append(f"{base_name}.lstmf")
         except Exception:
-            print("Failed to convert pairs. Exiting.")
-            return
+            print(f"\n[Warning] Font '{base_name}' failed to convert. This usually happens if the font has buggy glyph metrics (like pixel fonts). Skipping this font and continuing...")
+            
+    if not successful_lstmf_files:
+        print("\nError: No training pairs were successfully converted to .lstmf files.")
+        print("Please check that your training images contain clear text and valid box files.")
+        return
 
     # 4. Extract the base LSTM model from existing khm.traineddata
     print("\nExtracting the base LSTM model from existing khm.traineddata...")
@@ -112,30 +118,14 @@ def start_training(training_dir, max_iterations):
         print("Failed to extract base model. Make sure Tesseract training tools are installed.")
         return
 
-    # 5. Verify train_listfile.txt contains correct paths
+    # 5. Write only the successful .lstmf files to train_listfile.txt using absolute paths
     list_file_path = os.path.join(training_dir, "train_listfile.txt")
-    if not os.path.exists(list_file_path):
-        # Create it if missing
-        lstmf_files = [f for f in os.listdir(training_dir) if f.endswith(".lstmf")]
-        with open(list_file_path, "w", encoding="utf-8") as f:
-            f.write("\n".join(lstmf_files) + "\n")
-            
-    # Modify the listfile to use absolute paths so lstmtraining doesn't get lost
-    with open(list_file_path, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-    
-    abs_lines = []
-    for line in lines:
-        line = line.strip()
-        if not line:
-            continue
-        if not os.path.isabs(line):
-            abs_lines.append(os.path.abspath(os.path.join(training_dir, line)))
-        else:
-            abs_lines.append(line)
-            
+    abs_lines = [os.path.abspath(os.path.join(training_dir, f)) for f in successful_lstmf_files]
     with open(list_file_path, "w", encoding="utf-8") as f:
         f.write("\n".join(abs_lines) + "\n")
+    print(f"Created training manifest file at: {list_file_path}")
+    print(f"Manifest contains {len(abs_lines)} successfully converted fonts.")
+
 
     # 6. Start the actual neural network training (lstmtraining)
     print(f"\nStarting neural network training for {max_iterations} iterations...")
