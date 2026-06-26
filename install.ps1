@@ -183,8 +183,9 @@ try {
     Write-Host "Virtual environment configured." -ForegroundColor Green
     
     Write-Host "Installing Python dependencies (requirements.txt)..." -ForegroundColor Yellow
-    Start-Process ".\venv\Scripts\python.exe" -ArgumentList "-m pip install --upgrade pip" -Wait -NoNewWindow
-    Start-Process ".\venv\Scripts\pip.exe" -ArgumentList "install -r requirements.txt" -Wait -NoNewWindow
+    # Run pip directly in the console to show live download progress, speeds, and percentages
+    & ".\venv\Scripts\python.exe" -m pip install --upgrade pip
+    & ".\venv\Scripts\pip.exe" install -r requirements.txt
     Write-Host "Dependencies successfully installed." -ForegroundColor Green
     
     # Generate custom Windows ICO file during installation
