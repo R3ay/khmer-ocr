@@ -16,13 +16,22 @@ LOG_FILE = LOG_DIR / "app.log"
 LOG_LEVEL = logging.INFO
 
 # Tesseract Configuration
-# Common Windows installation paths for Tesseract
-TESSERACT_SEARCH_PATHS = [
-    r"C:\Program Files\Tesseract-OCR\tesseract.exe",
-    r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
-    os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"),
-    os.path.expandvars(r"%LOCALAPPDATA%\Programs\Tesseract-OCR\tesseract.exe"),
-]
+# Common installation paths for Tesseract on Windows and macOS
+import sys
+
+TESSERACT_SEARCH_PATHS = []
+if sys.platform == "win32":
+    TESSERACT_SEARCH_PATHS = [
+        r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+        r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+        os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"),
+        os.path.expandvars(r"%LOCALAPPDATA%\Programs\Tesseract-OCR\tesseract.exe"),
+    ]
+elif sys.platform == "darwin":  # macOS
+    TESSERACT_SEARCH_PATHS = [
+        "/opt/homebrew/bin/tesseract",  # Apple Silicon (M1/M2/M3)
+        "/usr/local/bin/tesseract",    # Intel Macs
+    ]
 
 def get_tesseract_path() -> str:
     """Find the Tesseract executable path, prioritizing environment variable."""
@@ -34,8 +43,11 @@ def get_tesseract_path() -> str:
         if os.path.exists(path):
             return path
             
-    # Default to standard path if none found
-    return r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    # Default to standard Windows path if none found
+    if sys.platform == "win32":
+        return r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    else:
+        return "tesseract"  # Rely on system PATH for Unix/macOS
 
 TESSERACT_CMD = get_tesseract_path()
 OCR_LANG = "khm"

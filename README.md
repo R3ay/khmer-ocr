@@ -30,17 +30,23 @@ khmer-ocr/
 
 ---
 
-## Quick Installation (PowerShell One-Liner)
+## Quick Installation (One-Liner Installers)
 
-You can automatically install the application and all its prerequisites (including Tesseract OCR, the Khmer language pack, Python 3, and dependencies) by running a single command. 
+You can automatically install the application and all its prerequisites (including Tesseract OCR, the high-accuracy Khmer language pack, Python 3, and all dependencies) by running a single command in your terminal.
 
+### For Windows
 Open **PowerShell as Administrator** and execute:
-
 ```powershell
 powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; irm 'https://raw.githubusercontent.com/OiiiSteav/khmer-ocr/main/install.ps1' | iex"
 ```
+*This will silently deploy the app to `%USERPROFILE%\KhmerOCR`, set up a virtual environment, install requirements, download the high-accuracy `tessdata_best` pack, and create Desktop and Startup shortcuts.*
 
-*This script will silently deploy the application to `%USERPROFILE%\KhmerOCR`, configure a virtual environment, install dependencies, download the high-accuracy `tessdata_best` Khmer language pack, and create startup and desktop shortcuts.*
+### For macOS
+Open your **Terminal** and execute:
+```bash
+curl -fsSL https://raw.githubusercontent.com/OiiiSteav/khmer-ocr/main/install.sh | bash
+```
+*This will deploy the app to `~/KhmerOCR`, verify/install Homebrew and Tesseract, download the high-accuracy `tessdata_best` pack, set up the virtual environment, and create a double-clickable launcher on your Desktop (`Khmer OCR.command`).*
 
 ---
 
