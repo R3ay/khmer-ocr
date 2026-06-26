@@ -30,6 +30,17 @@ This will produce:
 * `khm.customfont.exp0.tif`
 * `khm.customfont.exp0.box`
 
+### Alternative: Smart System-Wide Auto-Scanner (Recommended)
+If you want to make your OCR engine smarter by automatically learning **all** the Khmer fonts installed on your device, you can use the smart auto-scanner:
+```bash
+python auto_generate_system_training.py --output-dir system_training_data
+```
+**What this script does:**
+1. It automatically scans your entire operating system's font directories (e.g. `C:\Windows\Fonts` and local appdata folders on Windows, or standard font folders on macOS).
+2. It uses `fontTools` to read the binary Character Map (cmap) of every font, **automatically filtering for only those that support the Khmer Unicode range**.
+3. For every detected Khmer font, it automatically renders our high-density training corpus and generates the corresponding `.tif` and `.box` pairs.
+4. It compiles a single `train_listfile.txt` listing all generated files, allowing you to train Tesseract on **all of your system's Khmer fonts simultaneously in one single command**.
+
 ---
 
 ## Step 2: Install Tesseract Training Tools
