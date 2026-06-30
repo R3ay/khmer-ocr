@@ -76,42 +76,87 @@ def normalize_khmer_vowels(text: str) -> str:
 
 def correct_khmer_ocr_errors(text: str) -> str:
     """
-    Corrects common Khmer OCR misrecognitions (Samyok Sanya, dependent vowels, independent vowels).
-    Uses a combination of regex-based systematic corrections and dictionary-based replacements.
+    Advanced Khmer OCR Error Corrector.
+    Uses high-precision regexes with character classes representing common visual 
+    and typing confusions in Khmer script to automatically correct misrecognized words.
     """
     import re
     
     # 1. Systematic correction: ព៌ (Po + Reahmuk) is always a mistake for ព័ (Po + Samyok Sanya)
     text = re.sub(r'ព៌', 'ព័', text)
     
-    # 2. Dictionary of common word/phrase OCR misrecognitions
-    replacements = {
-        "ប្រកេចញ": "ច្រកចេញ",
-        "ថ្លាក់ឃ្នំ": "ថ្នាក់ឃុំ",
-        "ថ្លាក់ឃុំ": "ថ្នាក់ឃុំ",
-        "ព៌ត៌មាន": "ព័ត៌មាន",
-        "ព៌តមាន": "ព័ត៌មាន",
-        "ព័តមាន": "ព័ត៌មាន",
-        "ប្រព៌ន្ធ": "ប្រព័ន្ធ",
-        "ប្រពន្ធ័": "ប្រព័ន្ធ",
-        "ប្រព័ន្ឋ": "ប្រព័ន្ធ",
-        "រដ្ធបាល": "រដ្ឋបាល",
-        "សងកាត់": "សង្កាត់",
-        "សនើយ៍": "សេនីយ៍",
-        "ម៉ងេ": "ម៉េង",
-        "ម៉ងតេុង": "ម៉េងតុង",
-        "ម៉ងតុង": "ម៉េងតុង",
-        "សម្របសម្រល": "សម្របសម្រួល",
-    }
+    # 2. Typing correction: Normalize incorrect subscript ordering in 'មន្ត្រី'
+    # 'មន្រ្តី' (incorrect: Coeng Ro + Coeng Ta) -> 'មន្ត្រី' (correct: Coeng Ta + Coeng Ro)
+    text = text.replace('\u1798\u1793\u17D2\u179A\u17D2\u178F\u17B8', '\u1798\u1793\u17D2\u178F\u17D2\u179A\u17B8')
     
-    for src, dst in replacements.items():
-        text = text.replace(src, dst)
-        
-    # 3. Context-aware correction: ក្រូម -> ក្រុម
-    # Replace "ក្រូម" with "ក្រុម" unless it's preceded by "ហ្គូហ្គល" or "Google" (Google Chrome)
-    text = re.sub(r'(?<!ហ្គូហ្គល)(?<!ហ្គូហ្គល )(?<!Google )ក្រូម', 'ក្រុម', text)
+    # 3. Regex-based smart corrections for common words
+    # These use character classes to match visual confusions (e.g. ុ vs ូ, ័ vs ៌, ន vs ល, ឋ vs ឌ vs ធ)
     
-    # 4. Standalone word correction: ប្រស -> ប្រុស (avoiding matching prefixes like ប្រសិន, ប្រសាសន៍, ប្រសើរ)
+    # Correct 'ព័ត៌មាន' (matches: ព៌ត៌មាន, ព័តមាន, ប៌ត៌មាន, ព័ត៌មាល, etc.)
+    text = re.sub(r'[ពប][័៌៍]ត[៌័៍]?[មណ][ាា]?[នល]', 'ព័ត៌មាន', text)
+    
+    # Correct 'ប្រព័ន្ធ' (matches: ប្រព៌ន្ធ, ប្រពន្ធ័, ប្រព័ន្ឋ, ប្រពល្ឌ, etc.)
+    text = re.sub(r'ប្រ[ពប][័៌៍]?[នល]្?[ធឋឌ]៍?', 'ប្រព័ន្ធ', text)
+    text = re.sub(r'ប្រ[ពប][័៌៍][នល]្[ធឋឌ]', 'ប្រព័ន្ធ', text)
+    
+    # Correct 'ក្រុមហ៊ុន' (matches: ក្រូមហ៊ុន, ក្រុមហ៊ុន, ក្រូមហ៊ូន, etc.)
+    text = re.sub(r'ក្រ[ុូ]ម[ហវ][ុូ]ន', 'ក្រុមហ៊ុន', text)
+    
+    # Correct 'ច្រកចេញ' & 'ច្រកចេញចូល' (matches: ប្រកេចញ, ប្រកេចញចូល, ច្រកេចញ, etc.)
+    text = re.sub(r'[ច្រប្រវ្រ]ក[េ]?[ចប]ញ[ចូលចល]+', 'ច្រកចេញចូល', text)
+    text = re.sub(r'[ច្រប្រវ្រ]ក[េ]?[ចប]ញ', 'ច្រកចេញ', text)
+    
+    # Correct 'ថ្នាក់ឃុំ' (matches: ថ្លាក់ឃ្នំ, ថ្លាក់ឃុំ, ថ្នាក់ឃ្នំ, etc.)
+    text = re.sub(r'ថ[្ន្ល]ាក់[ឃគ][្នុូ]?[ំម]', 'ថ្នាក់ឃុំ', text)
+    
+    # Correct 'សង្កាត់' (matches: សងកាត់, សង្កត, etc.)
+    text = re.sub(r'សង[្]?កា?[តថ]់', 'សង្កាត់', text)
+    
+    # Correct 'សម្របសម្រួល' (matches: សម្របសម្រល, សម្របសម្រូល, etc.)
+    text = re.sub(r'សម្របសម្រ[ួូ]?ល', 'សម្របសម្រួល', text)
+    
+    # Correct 'សេនីយ៍' (matches: សនើយ៍, សេលីយ៍, សនីយ៍, etc.)
+    # This automatically fixes 'អនុសនើយ៍' -> 'អនុសេនីយ៍' and 'វរសនើយ៍' -> 'វរសេនីយ៍'
+    text = re.sub(r'ស[េ]?[នល][ីើើ]យ៍', 'សេនីយ៍', text)
+    
+    # Correct 'នាយកដ្ឋាន' (matches: នាយកដាន, នាយកថាល, etc.)
+    text = re.sub(r'នាយក[ដឌឋ]ា[នល]', 'នាយកដ្ឋាន', text)
+    text = re.sub(r'នាយក[ដឌឋ]ាន', 'នាយកដ្ឋាន', text)
+    
+    # Correct 'អគ្គនាយកដ្ឋាន'
+    text = re.sub(r'អគ្គនាយក[ដឌឋ]ា[នល]', 'អគ្គនាយកដ្ឋាន', text)
+    
+    # Correct 'គ្រប់គ្រង'
+    text = re.sub(r'គ្រ[ុូ]បគ្រ[ុូ]?ង', 'គ្រប់គ្រង', text)
+    
+    # Correct 'ក្រសួង'
+    text = re.sub(r'ក្រស[ួូ]ង', 'ក្រសួង', text)
+    
+    # Correct 'សេវា'
+    text = re.sub(r'សេវ[ាា]', 'សេវា', text)
+    
+    # Correct 'អត្តសញ្ញាណកម្ម'
+    text = re.sub(r'អត្តសញ[្]?ញាណក[មម]', 'អត្តសញ្ញាណកម្ម', text)
+    
+    # Correct 'អាសយដ្ឋាន'
+    text = re.sub(r'អាសយ[ដឌឋ]ា[នល]', 'អាសយដ្ឋាន', text)
+    
+    # Correct 'ទូរស័ព្ទ'
+    text = re.sub(r'ទូរស[័៌]ព្[ទធ]', 'ទូរស័ព្ទ', text)
+    
+    # Correct 'អ៊ីមែល'
+    text = re.sub(r'អ៊ីម[ែេ]ល', 'អ៊ីមែល', text)
+    
+    # Correct 'កម្ពុជា'
+    text = re.sub(r'ក[មម]្ពុជ[ាា]', 'កម្ពុជា', text)
+    
+    # Correct 'ភ្នំពេញ'
+    text = re.sub(r'ភ្ន[ំម]ពេញ', 'ភ្នំពេញ', text)
+    
+    # 4. Context-aware correction for 'ក្រូម' -> 'ក្រុម' (if not part of Google Chrome)
+    text = re.sub(r'(?<!ហ្គូហ្គល)(?<!ហ្គូហ្គល )(?<!Google )ក្រ[ុូ]ម', 'ក្រុម', text)
+    
+    # 5. Standalone word correction: ប្រស -> ប្រុស (avoiding matching prefixes like ប្រសិន, ប្រសាសន៍, ប្រសើរ)
     # Matches "ប្រស" only if not surrounded by any Khmer letters (U+1780 to U+17D3)
     text = re.sub(r'(?<![\u1780-\u17D3])ប្រស(?![\u1780-\u17D3])', 'ប្រុស', text)
     
@@ -160,9 +205,12 @@ class OCRWorker(QThread):
             img_pass_a = scaled_img
             
             # --- Pass B: Binarized + Line-Erase Pipeline (Optimized for Bold, Underlines, Strikethroughs, Highlights) ---
-            # Softer threshold binarization (185) preserves thin strokes like parentheses '( )' and diacritics 
-            # while still turning gray highlight backgrounds to pure white.
-            threshold = 185
+            # Smart Adaptive Thresholding: Calculates threshold dynamically based on the image's mean brightness.
+            # This adapts to different lighting conditions.
+            mean_brightness = ImageStat.Stat(scaled_img).mean[0]
+            threshold = max(110, min(200, int(mean_brightness * 0.85)))
+            logger.info(f"Adaptive thresholding: mean brightness={mean_brightness:.1f}, selected threshold={threshold}")
+            
             binarized_img = scaled_img.point(lambda p: 255 if p > threshold else 0)
             
             # Erase underlines and strikethroughs to prevent characters from being glued together
@@ -267,6 +315,8 @@ class OCRWorker(QThread):
         and erases horizontal runs of black pixels that are longer
         than 20% of the image width. Optimized using fast C-level bounding
         box and row checks to skip blank padding rows immediately (80% faster).
+        Thick & Skew-tolerant: Erases adjacent top/bottom pixels to ensure
+        tilted or thick underlines are completely cleared.
         """
         try:
             width, height = image.size
@@ -298,8 +348,13 @@ class OCRWorker(QThread):
                             run_length = x - run_start
                             if run_length > line_threshold:
                                 # Erase the line segment by turning it white
+                                # Also erase immediate top/bottom neighbors to handle thickness/skew
                                 for rx in range(run_start, x):
                                     pixels[rx, y] = 255
+                                    if y > 0 and pixels[rx, y-1] == 0:
+                                        pixels[rx, y-1] = 255
+                                    if y < height - 1 and pixels[rx, y+1] == 0:
+                                        pixels[rx, y+1] = 255
                             run_start = None
                             
                 # Check at the end of the row
@@ -308,6 +363,10 @@ class OCRWorker(QThread):
                     if run_length > line_threshold:
                         for rx in range(run_start, width):
                             pixels[rx, y] = 255
+                            if y > 0 and pixels[rx, y-1] == 0:
+                                pixels[rx, y-1] = 255
+                            if y < height - 1 and pixels[rx, y+1] == 0:
+                                pixels[rx, y+1] = 255
             return image
         except Exception as e:
             logger.error(f"Error in horizontal line removal: {e}")
