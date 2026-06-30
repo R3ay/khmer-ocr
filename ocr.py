@@ -1,4 +1,6 @@
+import os
 import logging
+import tempfile
 import pytesseract
 from PIL import Image
 from PyQt6.QtCore import QThread, pyqtSignal
@@ -8,6 +10,40 @@ logger = logging.getLogger("KhmerOCR.OCR")
 
 # Set the Tesseract executable path in pytesseract
 pytesseract.pytesseract.tesseract_cmd = config.TESSERACT_CMD
+
+# Try importing Kiri OCR (Deep learning-based OCR)
+HAS_KIRI_OCR = False
+try:
+    from kiri_ocr import OCR as KiriOCR
+    HAS_KIRI_OCR = True
+    logger.info("Kiri OCR library successfully imported.")
+except ImportError:
+    logger.warning("Kiri OCR library not found. Falling back to Tesseract.")
+
+# Try importing Seanghay's Khmer Normalizer (Linguistic text normalization)
+HAS_KHMER_NORMALIZER = False
+try:
+    from khmernormalizer import normalize as khmer_normalize
+    HAS_KHMER_NORMALIZER = True
+    logger.info("Seanghay's Khmer Normalizer successfully imported.")
+except ImportError:
+    logger.warning("Seanghay's Khmer Normalizer not found. Using custom normalization.")
+
+_kiri_ocr_instance = None
+
+def get_kiri_ocr_instance():
+    """Returns a cached singleton instance of Kiri OCR to avoid reloading models on every run."""
+    global _kiri_ocr_instance
+    if _kiri_ocr_instance is None and HAS_KIRI_OCR:
+        try:
+            logger.info("Loading Kiri OCR models (ONNX)...")
+            # Kiri OCR supports "accurate", "fast", and "beam" decoding
+            _kiri_ocr_instance = KiriOCR(decode_method="accurate")
+            logger.info("Kiri OCR models loaded successfully.")
+        except Exception as e:
+            logger.error(f"Failed to initialize Kiri OCR: {e}")
+            _kiri_ocr_instance = None
+    return _kiri_ocr_instance
 
 def reorder_khmer_vowels(text: str) -> str:
     """
@@ -164,8 +200,9 @@ def correct_khmer_ocr_errors(text: str) -> str:
 
 class OCRWorker(QThread):
     """
-    A QThread worker to perform offline OCR using Tesseract in the background
-    to avoid freezing the main application GUI.
+    A QThread worker to perform offline OCR in the background.
+    Supports Kiri OCR (Deep learning-based) as the primary engine, 
+    with a robust 3-Pass Parallel Tesseract Ensemble as a fallback.
     """
     finished = pyqtSignal(str)
     error = pyqtSignal(str)
@@ -175,139 +212,147 @@ class OCRWorker(QThread):
         self.image = image
 
     def run(self):
-        logger.info("OCR worker thread started with Three-Pass Formatting-Aware Ensemble.")
+        logger.info("OCR worker thread started.")
+        
+        # Determine whether to use Kiri OCR
+        use_kiri = HAS_KIRI_OCR and (getattr(config, "OCR_ENGINE", "tesseract") == "kiri-ocr")
+        
         try:
-            from PIL import ImageOps, ImageStat
+            raw_text = ""
+            if use_kiri:
+                kiri = get_kiri_ocr_instance()
+                if kiri is not None:
+                    logger.info("Running Kiri OCR (ONNX Inference)...")
+                    with tempfile.TemporaryDirectory() as temp_dir:
+                        temp_path = os.path.join(temp_dir, "capture.png")
+                        self.image.save(temp_path)
+                        raw_text, _ = kiri.extract_text(temp_path)
+                else:
+                    logger.warning("Kiri OCR initialization failed. Falling back to Tesseract.")
+                    use_kiri = False
             
-            # --- Common Preprocessing Stage ---
-            # 1. Convert to grayscale to remove color noise and highlight backgrounds
-            gray_img = self.image.convert('L')
+            # Run Tesseract fallback if Kiri is not used or failed
+            if not use_kiri:
+                logger.info("Running Tesseract Three-Pass Parallel OCR Ensemble...")
+                raw_text = self._run_tesseract_ensemble()
+                
+            # --- Post-Processing Pipeline ---
+            # 1. Vowel Reordering
+            ordered_text = reorder_khmer_vowels(raw_text.strip())
             
-            # 2. Stretch contrast to make text strokes bold and distinct from highlights
-            contrast_img = ImageOps.autocontrast(gray_img)
-            
-            # 3. Intelligent Background Inversion (Light-on-Dark Text / Dark Highlights detection)
-            stat = ImageStat.Stat(contrast_img)
-            avg_brightness = stat.mean[0]
-            
-            if avg_brightness < 127:
-                logger.info(f"Dark background/highlight detected (avg: {avg_brightness:.1f}). Inverting image.")
-                base_img = ImageOps.invert(contrast_img)
+            # 2. Unicode Normalization
+            if HAS_KHMER_NORMALIZER:
+                logger.info("Using Seanghay's Khmer Normalizer...")
+                normalized_text = khmer_normalize(ordered_text)
             else:
-                base_img = contrast_img
-            
-            # 4. Scale up 2x using high-quality Lanczos interpolation
-            # This is the optimal resolution for Tesseract character recognition
-            w, h = base_img.size
-            scaled_img = base_img.resize((w * 2, h * 2), Image.Resampling.LANCZOS)
-            
-            # --- Pass A: Standard Pipeline (Optimized for Thin/Standard Body Fonts) ---
-            img_pass_a = scaled_img
-            
-            # --- Pass B: Binarized + Line-Erase Pipeline (Optimized for Bold, Underlines, Strikethroughs, Highlights) ---
-            # Smart Adaptive Thresholding: Calculates threshold dynamically based on the image's mean brightness.
-            # This adapts to different lighting conditions.
-            mean_brightness = ImageStat.Stat(scaled_img).mean[0]
-            threshold = max(110, min(200, int(mean_brightness * 0.85)))
-            logger.info(f"Adaptive thresholding: mean brightness={mean_brightness:.1f}, selected threshold={threshold}")
-            
-            binarized_img = scaled_img.point(lambda p: 255 if p > threshold else 0)
-            
-            # Erase underlines and strikethroughs to prevent characters from being glued together
-            img_pass_b = self._remove_horizontal_lines(binarized_img.copy())
-            
-            # --- Pass C: Deslanted + Binarized + Line-Erase Pipeline (Optimized for Italic Formats) ---
-            # Shears the image to correct the italic slant, making characters vertical to prevent vertical overlap.
-            shear_factor = 0.18  # Standard italic angle correction factor
-            deslanted_img = binarized_img.transform(
-                binarized_img.size,
-                Image.AFFINE,
-                (1, shear_factor, 0, 0, 1, 0),
-                fillcolor=255
-            )
-            img_pass_c = self._remove_horizontal_lines(deslanted_img)
-            
-            # Configuration
-            custom_config = r"--psm 6"
-            
-            # --- Run Three-Pass OCR in Parallel (3x Speedup) ---
-            # By running the passes concurrently in a ThreadPoolExecutor, the total execution time
-            # drops from ~1.5s (sequential) to ~0.4s (parallel, which is the speed of a single pass).
-            import concurrent.futures
-            
-            def run_single_pass(pass_id, image, name):
-                logger.info(f"Starting {name} in background thread...")
-                text, conf = self._ocr_with_confidence(image, custom_config)
-                return pass_id, name, text, conf
+                normalized_text = normalize_khmer_vowels(ordered_text)
                 
-            logger.info("Orchestrating Three-Pass Parallel OCR Ensemble...")
-            results = {}
-            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-                futures = {
-                    executor.submit(run_single_pass, "A", img_pass_a, "Pass A (Standard)"): "A",
-                    executor.submit(run_single_pass, "B", img_pass_b, "Pass B (Line Erase)"): "B",
-                    executor.submit(run_single_pass, "C", img_pass_c, "Pass C (Deslanted)"): "C"
-                }
-                for future in concurrent.futures.as_completed(futures):
-                    pass_id, name, text, conf = future.result()
-                    results[pass_id] = (name, text, conf)
-                    
-            name_a, text_a, conf_a = results["A"]
-            name_b, text_b, conf_b = results["B"]
-            name_c, text_c, conf_c = results["C"]
-            
-            logger.info(f"Pass A (Standard) Conf: {conf_a:.1f}% | '{text_a[:20].strip()}...'")
-            logger.info(f"Pass B (Line Erase) Conf: {conf_b:.1f}% | '{text_b[:20].strip()}...'")
-            logger.info(f"Pass C (Deslanted) Conf: {conf_c:.1f}% | '{text_c[:20].strip()}...'")
-            
-            # Select the result with the highest confidence score
-            best_text = text_a
-            best_conf = conf_a
-            selected_pass = name_a
-            
-            if conf_b > best_conf and len(text_b.strip()) > 0:
-                best_text = text_b
-                best_conf = conf_b
-                selected_pass = name_b
-                
-            if conf_c > best_conf and len(text_c.strip()) > 0:
-                best_text = text_c
-                best_conf = conf_c
-                selected_pass = name_c
-                
-            logger.info(f"Selecting {selected_pass} with confidence {best_conf:.1f}%")
-            
-            # Final cleanup, vowel reordering, normalization, error correction, and emit
-            ordered_text = reorder_khmer_vowels(best_text.strip())
-            normalized_text = normalize_khmer_vowels(ordered_text)
+            # 3. Spelling Error Correction
             corrected_text = correct_khmer_ocr_errors(normalized_text)
+            
+            logger.info(f"OCR complete. Characters recognized: {len(corrected_text)}")
             self.finished.emit(corrected_text)
-            
-        except pytesseract.TesseractNotFoundError:
-            err_msg = (
-                f"Tesseract executable not found at: '{config.TESSERACT_CMD}'.\n"
-                "Please install Tesseract and verify the path in config.py is correct."
-            )
-            logger.error(err_msg)
-            self.error.emit(err_msg)
-            
-        except pytesseract.TesseractError as te:
-            err_msg = str(te)
-            if "Error opening data file" in err_msg or config.OCR_LANG not in err_msg:
-                err_msg = (
-                    f"Tesseract failed. The '{config.OCR_LANG}' language pack might be missing.\n"
-                    f"Please download '{config.OCR_LANG}.traineddata' and place it in the Tesseract 'tessdata' folder.\n\n"
-                    f"Details: {err_msg}"
-                )
-            else:
-                err_msg = f"Tesseract OCR Error: {err_msg}"
-            logger.error(err_msg)
-            self.error.emit(err_msg)
             
         except Exception as e:
             err_msg = f"An unexpected error occurred during OCR: {str(e)}"
             logger.exception(err_msg)
             self.error.emit(err_msg)
+
+    def _run_tesseract_ensemble(self) -> str:
+        """Runs the 3-Pass Parallel Tesseract Ensemble (Grayscale, Binarized, Deslanted)."""
+        from PIL import ImageOps, ImageStat
+        
+        # --- Common Preprocessing Stage ---
+        # 1. Convert to grayscale to remove color noise and highlight backgrounds
+        gray_img = self.image.convert('L')
+        
+        # 2. Stretch contrast to make text strokes bold and distinct from highlights
+        contrast_img = ImageOps.autocontrast(gray_img)
+        
+        # 3. Intelligent Background Inversion (Light-on-Dark Text / Dark Highlights detection)
+        stat = ImageStat.Stat(contrast_img)
+        avg_brightness = stat.mean[0]
+        
+        if avg_brightness < 127:
+            logger.info(f"Dark background/highlight detected (avg: {avg_brightness:.1f}). Inverting image.")
+            base_img = ImageOps.invert(contrast_img)
+        else:
+            base_img = contrast_img
+        
+        # 4. Scale up 2x using high-quality Lanczos interpolation
+        w, h = base_img.size
+        scaled_img = base_img.resize((w * 2, h * 2), Image.Resampling.LANCZOS)
+        
+        # --- Pass A: Standard Pipeline (Optimized for Thin/Standard Body Fonts) ---
+        img_pass_a = scaled_img
+        
+        # --- Pass B: Binarized + Line-Erase Pipeline ---
+        # Smart Adaptive Thresholding: Calculates threshold dynamically based on the image's mean brightness.
+        mean_brightness = ImageStat.Stat(scaled_img).mean[0]
+        threshold = max(110, min(200, int(mean_brightness * 0.85)))
+        logger.info(f"Adaptive thresholding: mean brightness={mean_brightness:.1f}, selected threshold={threshold}")
+        
+        binarized_img = scaled_img.point(lambda p: 255 if p > threshold else 0)
+        img_pass_b = self._remove_horizontal_lines(binarized_img.copy())
+        
+        # --- Pass C: Deslanted + Binarized + Line-Erase Pipeline (Optimized for Italic Formats) ---
+        shear_factor = 0.18  # Standard italic angle correction factor
+        deslanted_img = binarized_img.transform(
+            binarized_img.size,
+            Image.AFFINE,
+            (1, shear_factor, 0, 0, 1, 0),
+            fillcolor=255
+        )
+        img_pass_c = self._remove_horizontal_lines(deslanted_img)
+        
+        # Configuration
+        custom_config = r"--psm 6"
+        
+        # --- Run Three-Pass OCR in Parallel (3x Speedup) ---
+        import concurrent.futures
+        
+        def run_single_pass(pass_id, image, name):
+            logger.info(f"Starting {name} in background thread...")
+            text, conf = self._ocr_with_confidence(image, custom_config)
+            return pass_id, name, text, conf
+            
+        logger.info("Orchestrating Three-Pass Parallel OCR Ensemble...")
+        results = {}
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            futures = {
+                executor.submit(run_single_pass, "A", img_pass_a, "Pass A (Standard)"): "A",
+                executor.submit(run_single_pass, "B", img_pass_b, "Pass B (Line Erase)"): "B",
+                executor.submit(run_single_pass, "C", img_pass_c, "Pass C (Deslanted)"): "C"
+            }
+            for future in concurrent.futures.as_completed(futures):
+                pass_id, name, text, conf = future.result()
+                results[pass_id] = (name, text, conf)
+                
+        name_a, text_a, conf_a = results["A"]
+        name_b, text_b, conf_b = results["B"]
+        name_c, text_c, conf_c = results["C"]
+        
+        logger.info(f"Pass A (Standard) Conf: {conf_a:.1f}% | '{text_a[:20].strip()}...'")
+        logger.info(f"Pass B (Line Erase) Conf: {conf_b:.1f}% | '{text_b[:20].strip()}...'")
+        logger.info(f"Pass C (Deslanted) Conf: {conf_c:.1f}% | '{text_c[:20].strip()}...'")
+        
+        # Select the result with the highest confidence score
+        best_text = text_a
+        best_conf = conf_a
+        selected_pass = name_a
+        
+        if conf_b > best_conf and len(text_b.strip()) > 0:
+            best_text = text_b
+            best_conf = conf_b
+            selected_pass = name_b
+            
+        if conf_c > best_conf and len(text_c.strip()) > 0:
+            best_text = text_c
+            best_conf = conf_c
+            selected_pass = name_c
+            
+        logger.info(f"Selecting {selected_pass} with confidence {best_conf:.1f}%")
+        return best_text
 
     def _remove_horizontal_lines(self, image):
         """

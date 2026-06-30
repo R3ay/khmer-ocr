@@ -61,3 +61,10 @@ OCR_LANG = "khm"
 HOTKEY_MODIFIERS = 0x0008 | 0x0004  # MOD_WIN | MOD_SHIFT
 HOTKEY_VK = 0x4B                     # Virtual Key Code for 'K' (0x4B)
 HOTKEY_ID = 1                        # Unique ID for the hotkey registration
+
+# OCR Engine Configuration
+# Available options:
+# 1. "kiri-ocr" (Highly accurate deep learning-based OCR specifically for English and Khmer)
+#    Note: Requires an internet connection on the first run to download ONNX models (~100MB).
+# 2. "tesseract" (Classic offline OCR using a 3-pass parallel ensemble)
+OCR_ENGINE = "kiri-ocr"

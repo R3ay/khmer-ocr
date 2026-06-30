@@ -5,3 +5,5 @@ pyperclip>=1.8.2
 pynput>=1.7.6
 pywin32>=306; sys_platform == 'win32'
 fonttools>=4.40.0; sys_platform == 'win32'
+kiri-ocr>=0.1.0
+khmernormalizer>=0.0.4
